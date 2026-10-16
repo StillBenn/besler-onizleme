@@ -1,0 +1,34 @@
+{
+  "vhPerFrame": 3.0,
+  "tone": "dark",
+  "vignette": 0.22,
+  "grain": 0.012,
+  "autoplay": 24,
+  "autoplayMs": 3200,
+  "endTone": "dark",
+  "chapters": [
+    {
+      "dir": "ch1/",
+      "vh": 3.0
+    },
+    {
+      "dir": "ch2/",
+      "vh": 2.8
+    },
+    {
+      "dir": "ch3/",
+      "vh": 3.0
+    },
+    {
+      "dir": "ch4/",
+      "vh": 3.0
+    },
+    {
+      "dir": "ch5/",
+      "vh": 2.6,
+      "crisp": 0.2
+    }
+  ],
+  "handoff": true,
+  "holdVh": 40
+}
