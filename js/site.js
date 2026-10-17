@@ -42,6 +42,8 @@
   }
 
   /* ---- the quote list ---- */
+  /* A card is one product; its packs (data-v) are what goes on the list, each on its own, by the pack's
+     image stem. The card shows the pack chosen (data-sel). */
   var KEY = "bs-quote";
   var load = function () { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } };
   var save = function (q) { try { localStorage.setItem(KEY, JSON.stringify(q)); } catch (e) { /* kept for this visit only */ } };
@@ -49,22 +51,32 @@
   var prods = [].slice.call(document.querySelectorAll(".prod"));
   var list = document.querySelector("[data-list]"), empty = document.querySelector("[data-empty]");
   var tray = document.querySelector("[data-qtray]"), count = document.querySelector("[data-qcount]");
-  var byId = {};
-  prods.forEach(function (p) { byId[p.getAttribute("data-id")] = p; });
+  var byId = {};                                   /* pack stem -> { card, chip } */
+  prods.forEach(function (p) {
+    [].slice.call(p.querySelectorAll("[data-v]")).forEach(function (c) { byId[c.getAttribute("data-v")] = { card: p, chip: c }; });
+  });
 
   function info(id) {
-    var p = byId[id];
-    if (!p) return null;
-    return { img: p.querySelector("img").getAttribute("src"), brand: p.querySelector(".prod__brand").textContent, name: p.querySelector(".prod__name").textContent,
-             fam: p.querySelector("[data-fam]").textContent, pack: p.querySelector("[data-pack]").textContent, meta: p.querySelector(".prod__meta").textContent };
+    var o = byId[id];
+    if (!o) return null;
+    var p = o.card, fam = t(p.getAttribute("data-fam")), pack = o.chip.textContent;
+    return { img: "./img/urun/" + id + ".webp", brand: t(p.getAttribute("data-brand")), name: t(p.getAttribute("data-name")),
+             fam: fam, pack: pack, meta: fam + " · " + pack };
   }
   var ids = function () { return Object.keys(quote).filter(function (id) { return byId[id]; }); };
+  function choose(p, id) {                         /* a card shows another of its packs */
+    p.setAttribute("data-sel", id);
+    [].slice.call(p.querySelectorAll("button[data-v]")).forEach(function (c) { c.setAttribute("aria-pressed", String(c.getAttribute("data-v") === id)); });
+    [].slice.call(p.querySelectorAll("[data-for]")).forEach(function (im) { im.classList.toggle("is-on", im.getAttribute("data-for") === id); });
+    paint();
+  }
   function paint() {
     prods.forEach(function (p) {
-      var on = !!quote[p.getAttribute("data-id")];
+      var sel = p.getAttribute("data-sel"), on = !!quote[sel];
       var b = p.querySelector("[data-add]");
       b.setAttribute("aria-pressed", String(on));
-      b.textContent = t(on ? "Listede" : "Teklife ekle");
+      b.querySelector("span").textContent = t(on ? "Listede" : "Teklife ekle");
+      [].slice.call(p.querySelectorAll("button[data-v]")).forEach(function (c) { c.classList.toggle("is-listed", !!quote[c.getAttribute("data-v")]); });
     });
     var n = ids().length;
     if (count) count.textContent = String(n);
@@ -95,26 +107,36 @@
     if (tray && quote[id]) { tray.classList.remove("is-bump"); void tray.offsetWidth; tray.classList.add("is-bump"); setTimeout(function () { tray.classList.remove("is-bump"); }, 420); }
   }
   prods.forEach(function (p) {
-    p.querySelector("[data-add]").addEventListener("click", function () { toggle(p.getAttribute("data-id")); });
+    p.querySelector("[data-add]").addEventListener("click", function () { toggle(p.getAttribute("data-sel")); });
+    [].slice.call(p.querySelectorAll("button[data-v]")).forEach(function (c) {
+      c.addEventListener("click", function () { choose(p, c.getAttribute("data-v")); });
+    });
   });
 
-  /* ---- a product, opened ---- */
-  var pv = document.querySelector("[data-pview]"), pvId = null;
+  /* ---- a product, opened: the pack chosen, its other packs to switch to ---- */
+  var pv = document.querySelector("[data-pview]"), pvCard = null;
   function paintView() {
-    var d = info(pvId); if (!d) return;
+    var id = pvCard.getAttribute("data-sel"), d = info(id); if (!d) return;
     pv.querySelector("[data-pv-img]").src = d.img;
     pv.querySelector("[data-pv-brand]").textContent = d.brand;
     pv.querySelector("[data-pv-name]").textContent = d.name;
     pv.querySelector("[data-pv-fam]").textContent = d.fam;
-    pv.querySelector("[data-pv-pack]").textContent = d.pack;
-    pv.querySelector("[data-pv-add]").textContent = t(quote[pvId] ? "Listeden çıkar" : "Teklife ekle");
-    pv.querySelector(".pview__img").style.setProperty("--tray", byId[pvId].style.getPropertyValue("--tray"));
+    var packs = pv.querySelector("[data-pv-pack]");
+    packs.textContent = "";
+    [].slice.call(pvCard.querySelectorAll("[data-v]")).forEach(function (c) {
+      var v = c.getAttribute("data-v");
+      var b = document.createElement("button"); b.type = "button"; b.textContent = c.textContent;
+      b.setAttribute("aria-pressed", String(v === id)); if (quote[v]) b.className = "is-listed";
+      b.addEventListener("click", function () { choose(pvCard, v); });
+      packs.appendChild(b);
+    });
+    pv.querySelector("[data-pv-add]").textContent = t(quote[id] ? "Listeden çıkar" : "Teklife ekle");
   }
   if (pv && pv.showModal) {
     prods.forEach(function (p) {
-      p.querySelector("[data-open]").addEventListener("click", function () { pvId = p.getAttribute("data-id"); paintView(); pv.showModal(); });
+      p.querySelector("[data-open]").addEventListener("click", function () { pvCard = p; paintView(); pv.showModal(); });
     });
-    pv.querySelector("[data-pv-add]").addEventListener("click", function () { toggle(pvId); paintView(); });
+    pv.querySelector("[data-pv-add]").addEventListener("click", function () { toggle(pvCard.getAttribute("data-sel")); paintView(); });
     pv.querySelector("[data-close]").addEventListener("click", function () { pv.close(); });
     pv.addEventListener("click", function (e) { if (e.target === pv) pv.close(); });
   }

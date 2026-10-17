@@ -133,6 +133,7 @@ class FrameStore {
        reader in chapter 2 met mostly atlas (measured on the live site). */
     this.packOf = packOf;
     this.failed = new Set();           /* packs that did not arrive: their frames come one by one */
+    this.packTries = {};               /* pack url -> times it failed (a packs-only set asks again) */
     this.blobs = new Array(count);
     this.gotAt = new Float64Array(count);   /* when each frame arrived: "late" means late after arriving */
     this.asked = new Uint8Array(count);
@@ -226,11 +227,14 @@ class FrameStore {
             });
           } catch (e) {
             if (gen !== this.gen) return;
-            /* the pack is lost, the frames are not: fetch them one by one */
-            this.failed.add(pk.url);
+            /* the pack is lost, the frames are not: fetch them one by one — or, where the set is
+               packs only (no single files on the server), ask for the pack again, a few times, later */
+            const tries = (this.packTries[pk.url] || 0) + 1;
+            this.packTries[pk.url] = tries;
+            if (!pk.only || tries >= 4) this.failed.add(pk.url);
             this.failT = performance.now();
             pk.sizes.forEach((_, k) => { if (!this.blobs[pk.first + k]) this.asked[pk.first + k] = 0; });
-            await new Promise((r) => setTimeout(r, 400));     /* a dropped link must not burn through every pack in a moment */
+            await new Promise((r) => setTimeout(r, 400 * tries));     /* a dropped link must not burn through every pack in a moment */
           }
           continue;
         }
@@ -545,12 +549,20 @@ export async function mountFilm(root, primary = true) {
      rest start HD and the quality guard below catches the slow ones */
   const weak = aspect === "9x16" && navigator.deviceMemory && navigator.deviceMemory < 6;
   const hd = forced === "hd" || (forced !== "lite" && !slow && !weak && need > (aspect === "9x16" ? 800 : 1700));
-  const chName = alt && /^[\w.-]+\.json$/.test(alt) ? alt : hd ? "manifest-hd.json" : "manifest.json";
+  /* AVIF: about 40% fewer bytes than WebP for a sharper picture (measured on these frames, 17.10.2026) — so the
+     HD set arrives in time on a link where WebP's did not. A browser that cannot decode it gets the WebP set. */
+  const avif = await new Promise((ok) => {
+    const im = new Image();
+    im.onload = () => ok(im.width > 0); im.onerror = () => ok(false);
+    im.src = "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=";
+  });
+  const LITE = avif ? "manifest.json" : "manifest-webp.json";
+  const chName = alt && /^[\w.-]+\.json$/.test(alt) ? alt : !avif ? LITE : hd ? "manifest-hd.json" : LITE;
   const chapters = await Promise.all(film.chapters.map(async (c) => {
     const dir = new URL(c.dir, filmUrl);
     /* the ?m= comparison set may exist for one chapter only: fall back */
     let r = await fetch(new URL(chName + mv, dir));
-    if (!r.ok && chName !== "manifest.json") r = await fetch(new URL("manifest.json" + mv, dir));
+    if (!r.ok && chName !== LITE) r = await fetch(new URL(LITE + mv, dir));
     const m = await r.json();
     return { dir, v: m.variants[aspect], count: m.frames, first: 0, q: m.rev ? `?r=${m.rev}` : "" };
   }));
@@ -608,7 +620,7 @@ export async function mountFilm(root, primary = true) {
   /* swap every chapter to the light set (same frames, same atlas) */
   async function toLite() {
     tier = "lite";
-    const lites = await Promise.all(chapters.map((c) => fetch(new URL("manifest.json" + mv, c.dir)).then((r) => r.json())));
+    const lites = await Promise.all(chapters.map((c) => fetch(new URL(LITE + mv, c.dir)).then((r) => r.json())));
     chapters.forEach((c, k) => { c.v = lites[k].variants[aspect]; c.q = lites[k].rev ? `?r=${lites[k].rev}` : ""; });
     renderer.frameW = chapters[0].v.w; renderer.frameH = chapters[0].v.h;
     renderer.held = [-1, -1];
@@ -679,6 +691,7 @@ export async function mountFilm(root, primary = true) {
       first: c.first + k * pk.n,
       sizes: pk.sizes.slice(k * pk.n, (k + 1) * pk.n),
       type: `image/${c.v.ext}`,
+      only: !!pk.only,
     };
   };
   const store = new FrameStore(n, urlOf, fine ? 32 : mem >= 6 ? 20 : 12, packOf);
@@ -716,6 +729,7 @@ export async function mountFilm(root, primary = true) {
       .finally(() => making.delete(k));
   };
 
+  let bootInfo = null;
   /* The first atlas comes first: once it is on the GPU the opening chapter can
      be scrubbed, before a single full frame has arrived. */
   try {
@@ -726,15 +740,25 @@ export async function mountFilm(root, primary = true) {
     /* The atlas is the first real download and both tiers share it, so its
        speed decides whether the HD set (~40% more bytes) can arrive in time.
        Under 5 Mbit: the light set, before a single frame is fetched. */
-    const mbit = (first.size * 8) / 1e6 / Math.max(0.05, (performance.now() - t0) / 1000);
-    if (tier === "hd" && !forced && mbit < 5) await toLite().catch(() => {});
+    /* the transfer itself, not the wait for its first byte: a far server answering in 0.34 s made a
+       16 Mbit link read as 3 Mbit, and the reader got the light set on a link that carries HD (measured) */
+    const aUrl = new URL(chapters[0].v.atlas.file + chapters[0].q, chapters[0].dir).href;
+    const te = performance.getEntriesByName(aUrl).pop();
+    const secs = te && te.responseEnd > te.responseStart ? (te.responseEnd - te.responseStart) / 1000 : (performance.now() - t0) / 1000;
+    const mbit = (first.size * 8) / 1e6 / Math.max(0.05, secs);
+    bootInfo = { hd, avif, chName, mbit: +mbit.toFixed(1), secs: +secs.toFixed(3), kb: Math.round(first.size / 1024), timing: !!te };   /* ?probe shows it */
+    /* only a truly slow link is decided here: the atlas downloads beside the poster and the fonts, so a
+       16 Mbit link measured 4.6 on it (measured) — the frames' own rate (netT below) decides the rest */
+    if (tier === "hd" && !forced && mbit < 2) await toLite().catch(() => {});
     await renderer.addAtlasStriped(0, first, chapters[0].v.atlas, () => true);
     store.onNear = () => { if (booted) kick(); };
     store.limit = 2;
     store.download();
     /* The opening plays on its own, so its sharp frames must be here before
        it starts: the loader counts them (up to 60 — the rest arrive while the
-       first play), and gives up waiting after 3.5 s (the atlas covers). */
+       first play). It waits up to 14 s: the reader saw the opening drawn from the 256 px atlas
+       on a slow link ("144p") — the loader's ring keeps counting instead; and once playing, its clock
+       waits for each next frame (below) rather than cut to the atlas. */
     if (AUTO) {
       /* the frames it plays, from its first (not any frames: on a slow link
          those were the wrong ones) */
@@ -745,7 +769,7 @@ export async function mountFilm(root, primary = true) {
           for (let i = 0; i < want; i++) if (store.blobs[i]) got++;
           const k = got / want;
           intro.progress(0.75 + 0.25 * k);
-          if (k >= 1 || performance.now() - t1 > 5000) done(); else setTimeout(tick, 50);
+          if (k >= 1 || performance.now() - t1 > 14000) done(); else setTimeout(tick, 50);
         };
         tick();
       });
@@ -855,7 +879,7 @@ export async function mountFilm(root, primary = true) {
   if (hud) hud.hidden = false;
   const forceLo = params.has("lo");     /* debug: atlas only, to see the fallback layer */
   /* ?probe: per-frame log for an automated smoothness test */
-  const probe = params.has("probe") ? { log: [], edges: chapters.slice(1).map((c) => c.first), get tier() { return tier; } } : null;
+  const probe = params.has("probe") ? { log: [], edges: chapters.slice(1).map((c) => c.first), get tier() { return tier; }, get boot() { return bootInfo; } } : null;
   if (probe && primary) window.__film = probe;      /* the opening film is measured; the lazy ones must not overwrite it */
   /* ?probe also lists every film's memory, to test the release above */
   if (probe) (window.__films ||= {})[id] = { get atlases() { return renderer.atlases.size; }, get decoded() { return store.bitmaps.size; }, get loaded() { return store.loaded; } };
@@ -902,7 +926,7 @@ export async function mountFilm(root, primary = true) {
   /* The opening beat (data-in="0") must not wait for a scroll: a visitor who
      has not scrolled yet is exactly who needs the headline. It enters on a
      clock once the first frame is up, and leaves by scroll like every other. */
-  let introT0 = 0, introP = 0, autoP = AUTO ? 0 : 1;
+  let introT0 = 0, introP = 0, autoP = AUTO ? 0 : 1, introClock = 0;
   /* Quality guard. The HD set is chosen by screen size, but a device can have
      the pixels without the speed: measured on a phone at a quarter of this
      desktop's CPU, 720x1280 frames played 100% sharp, 900x1600 only 29% —
@@ -923,7 +947,10 @@ export async function mountFilm(root, primary = true) {
      set takes over, once: a fast scroll then stays sharp and on time instead of
      sharper and seconds behind (the client's own link to the preview measured
      ~2 MB/s with 0.34 s to first byte: ~22 HD phone frames a second). */
-  const NET_FPS = 40;
+  /* a desktop wheel moves ~4 frames a notch and strides past the rest, and the first seconds of a far
+     server read slow (its 0.34 s answer, the link warming up: 12 fps measured at 3 s on a link that
+     carries 30) — so a desktop is judged later, over a longer stretch, on a lower bar */
+  const NET_FPS = fine ? 18 : 40, NET_AT = fine ? 8000 : 3000, NET_WIN = fine ? 5000 : 4000;
   const avgBytes = () => {
     let b = 0, f = 0;
     for (const c of chapters) if (c.v.pack) { b += c.v.pack.sizes.reduce((x, y) => x + y, 0); f += c.count; }
@@ -934,9 +961,9 @@ export async function mountFilm(root, primary = true) {
     const since = performance.now() - store.t0;
     /* judged once six packs have landed (bytes count on arrival: earlier, the
        packs still in flight read as a dead link), or at 8 s whatever came */
-    if (since < 3000 || (since < 8000 && store.rx.filter((x) => x[0] >= store.t0).length < 6)) return;
+    if (since < NET_AT || (since < NET_AT + 5000 && store.rx.filter((x) => x[0] >= store.t0).length < 6)) return;
     if (performance.now() - store.failT < 4500) return;          /* a dropped link is not a slow one */
-    const fps = store.rate() / Math.max(1, avgBytes());
+    const fps = store.rate(NET_WIN) / Math.max(1, avgBytes());
     if (fps < NET_FPS) {
       clearInterval(netT);
       if (probe) probe.why = { net: +fps.toFixed(1), at: Math.round(since) };
@@ -962,7 +989,13 @@ export async function mountFilm(root, primary = true) {
     const hold = handoff ? Math.min(1, Math.max(0, (scrollY - top - span) / Math.max(1, holdPx))) : 0;
     /* the opening on its clock until the reader scrolls (a scroll during it
        takes over: the playhead eases on from wherever the pen had got to) */
-    autoP = AUTO ? (introT0 ? Math.min(1, (now - introT0) / AUTO_MS) : 0) : 1;
+    /* ...and it runs only while its next frame is here: a frame still on the way holds the opening still
+       for a moment (sharp) instead of showing the atlas in its place */
+    if (AUTO && introT0 && autoP < 1) {
+      const nextF = Math.min(AUTO, Math.floor(autoP * AUTO) + 2);
+      if (store.blobs[nextF]) introClock += Math.min(50, rawDt * 1000);
+      autoP = Math.min(1, introClock / AUTO_MS);
+    } else if (!AUTO) autoP = 1;
     let target = frameAt(p * totalVh + vh0);
     const onAuto = autoP < 1 && scrollY - top < 2;
     if (onAuto) target = autoP * AUTO;

@@ -1,12 +1,11 @@
 /* ==========================================================================
    Beşler — things that answer the reader
    --------------------------------------------------------------------------
-   · a family card and a product card lean toward the pointer, a soft light
-     following it (fine pointers only, never under reduced motion);
    · the figures count up once as they come on screen;
    · the production line draws itself as the reader scrolls past it, each
      step lighting as the line reaches it; the film still drifts against it;
-   · over the brand list, the pack of the brand under the pointer follows it;
+   · on the home page, the families' stage shows the pack of the family under
+     the pointer or the focus (it changes in place: nothing follows the pointer);
    · on the products page, the family bar marks the family on screen, and a
      products page block rises once as it arrives.
    Everything that moves per frame is a transform or a custom property on the
@@ -18,33 +17,6 @@
   var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var html = document.documentElement;
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
-
-  /* ---- cards that lean toward the pointer ---- */
-  function tilt(el, max) {
-    var raf = 0, px = 0.5, py = 0.5;
-    function paint() {
-      raf = 0;
-      el.style.setProperty("--ry", ((px - 0.5) * 2 * max).toFixed(2) + "deg");
-      el.style.setProperty("--rx", (-(py - 0.5) * 2 * max).toFixed(2) + "deg");
-      el.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
-      el.style.setProperty("--my", (py * 100).toFixed(1) + "%");
-    }
-    el.addEventListener("pointermove", function (e) {
-      var r = el.getBoundingClientRect();
-      px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      el.classList.add("is-tilting");
-      if (!raf) raf = requestAnimationFrame(paint);
-    });
-    el.addEventListener("pointerleave", function () {
-      el.classList.remove("is-tilting"); px = 0.5; py = 0.5;
-      if (!raf) raf = requestAnimationFrame(paint);
-    });
-  }
-  if (fine && !reduced) {
-    $$(".fam").forEach(function (c) { tilt(c, 5); });
-    $$(".prod").forEach(function (c) { tilt(c, 4); });
-  }
 
   /* ---- blocks rise once (the products page; the home page's are set by home.js) ---- */
   var rise = $$(".family__head, .prods, .phead > *");
@@ -112,25 +84,22 @@
     addEventListener("resize", scrolled); scrolled();
   }
 
-  /* ---- the brand list: the pack of the brand under the pointer follows it ---- */
-  var peek = document.querySelector(".peek"), peekImg = peek && peek.querySelector("img");
-  if (peek && fine && !reduced) {
-    var tx = 0, ty = 0, cx = 0, cy = 0, live = false, prf = 0;
-    var follow = function () {
-      cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18;
-      peek.style.setProperty("--px", cx.toFixed(1) + "px"); peek.style.setProperty("--py", cy.toFixed(1) + "px");
-      prf = live || Math.abs(tx - cx) + Math.abs(ty - cy) > 0.5 ? requestAnimationFrame(follow) : 0;
+  /* ---- the home page's families: the pack on the stage is the family under the pointer or the focus ---- */
+  var fxs = $$("[data-fx]");
+  if (fxs.length) {
+    var pics = $$("[data-fx-pic]"), caps = $$("[data-fx-cap]"), shown = "0", back = 0;
+    var show = function (i) {
+      clearTimeout(back);
+      if (i === shown) return;
+      shown = i;
+      pics.forEach(function (p) { p.classList.toggle("is-on", p.getAttribute("data-fx-pic") === i); });
+      caps.forEach(function (c) { c.hidden = c.getAttribute("data-fx-cap") !== i; });
+      fxs.forEach(function (f) { if (f.getAttribute("data-fx") === i) f.setAttribute("aria-current", "true"); else f.removeAttribute("aria-current"); });
     };
-    $$(".brand").forEach(function (b) {
-      var src = b.getAttribute("data-peek");
-      b.addEventListener("pointerenter", function (e) {
-        if (!src) { peek.classList.remove("is-on"); return; }
-        if (peekImg.getAttribute("src") !== src) peekImg.setAttribute("src", src);
-        tx = cx = e.clientX - 120; ty = cy = e.clientY - 120;
-        peek.classList.add("is-on"); live = true; if (!prf) prf = requestAnimationFrame(follow);
-      });
-      b.addEventListener("pointermove", function (e) { tx = e.clientX + 30; ty = e.clientY - 150; });
-      b.addEventListener("pointerleave", function () { peek.classList.remove("is-on"); live = false; });
+    fxs.forEach(function (f) {
+      var i = f.getAttribute("data-fx");
+      f.addEventListener("pointerenter", function () { if (fine) show(i); });
+      f.addEventListener("focus", function () { show(i); });
     });
   }
 

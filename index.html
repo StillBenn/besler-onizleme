@@ -17,8 +17,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
-<link rel="preload" href="./film/film.json?v=6" as="fetch" crossorigin>
-<link rel="stylesheet" href="./css/site.css?v=6">
+<link rel="preload" href="./film/film.json?v=7" as="fetch" crossorigin>
+<link rel="stylesheet" href="./css/site.css?v=7">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -69,7 +69,7 @@
        data-ch: the chapter (1 the grain, 2 the dough, 3 the shapes, 4 the colours,
        5 the drying, 6 the carton, 7 the world); data-in / data-out: the stretch of it
        the words stay (past 1 = into the hold after the last frame). -->
-  <section class="film" data-film="main" data-manifest="./film/film.json?v=6" aria-label="Beşler — film">
+  <section class="film" data-film="main" data-manifest="./film/film.json?v=7" aria-label="Beşler — film">
     <div class="film__stage">
       <picture class="film__poster">
         <source media="(orientation: portrait)" srcset="./film/poster-9x16.webp">
@@ -187,26 +187,19 @@
   </section>
 
   <!-- ===== The families: nine cards, each opening its part of the products page == -->
-  <section class="paper" id="aileler" aria-labelledby="aileler-title">
-    <header class="sec-head sec-head--split">
-      <div class="sec-head">
+  <section class="paper fam-sec" id="aileler" aria-labelledby="aileler-title">
+    <div class="fxs-wrap">
+      <div class="fxs__intro">
         <p class="label">Ürünlerimiz</p>
         <h2 class="sec-title" id="aileler-title">Dokuz ürün ailesi, <em>tek kalite.</em></h2>
+        <p class="sec-lead">Kutu ve poşette makarna, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, makarna cipsi, irmik ve un. Bir aileye dokunun, bütün ürünleri görün.</p>
       </div>
-      <p class="sec-lead">Kutu ve poşette makarna, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, makarna cipsi, irmik ve un. Bir aileye dokunun, bütün ürünleri görün.</p>
-    </header>
-    <ul class="fams">
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#makarna" style="--tray:#f1e3c8"><span class="fam__img"><img src="./img/urun/makarna-penne-rigate-kutu.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Makarna</h3><small>15 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#lazanya" style="--tray:#f0dccc"><span class="fam__img"><img src="./img/urun/lazanya-santa-sophia-lazanya.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Lazanya</h3><small>3 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#mac" style="--tray:#f4e3b3"><span class="fam__img"><img src="./img/urun/mac-cheese-mac-cheese-1.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Makarna Peyniri</h3><small>2 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#tam" style="--tray:#e7d8c2"><span class="fam__img"><img src="./img/urun/tam-bugday-penne-rigate.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Tam Buğday</h3><small>4 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#uc" style="--tray:#f1d8cc"><span class="fam__img"><img src="./img/urun/uc-renkli-fusilli-1.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Üç Renkli</h3><small>3 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#glutensiz" style="--tray:#e3e7d3"><span class="fam__img"><img src="./img/urun/glutensiz-fusilli.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Glutensiz</h3><small>3 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#cips" style="--tray:#f3d2c4"><span class="fam__img"><img src="./img/urun/makarna-cipsi-peynir.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Makarna Cipsi</h3><small>3 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#irmik" style="--tray:#efe0bc"><span class="fam__img"><img src="./img/urun/irmik-irmik-2.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>İrmik</h3><small>3 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-      <li class="fam"><a class="fam__a" href="./urunlerimiz.html#un" style="--tray:#ece6dc"><span class="fam__img"><img src="./img/urun/un-un.webp" alt="" loading="lazy" decoding="async"></span><span class="fam__t"><span><h3>Un</h3><small>1 ürün</small></span><span class="fam__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></a></li>
-    </ul>
-    <div class="fams__more"><a class="btn btn--red" href="./urunlerimiz.html">Tüm ürünlerimiz <svg class="arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      <div class="fxs">
+      <ul class="fxs__list"><li><a class="fx" href="./urunlerimiz.html#makarna" data-fx="0" aria-current="true"><span class="fx__n">01</span><span class="fx__name">Makarna</span><span class="fx__c">8 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#lazanya" data-fx="1"><span class="fx__n">02</span><span class="fx__name">Lazanya</span><span class="fx__c">2 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#mac" data-fx="2"><span class="fx__n">03</span><span class="fx__name">Makarna Peyniri</span><span class="fx__c">2 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#tam" data-fx="3"><span class="fx__n">04</span><span class="fx__name">Tam Buğday</span><span class="fx__c">4 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#uc" data-fx="4"><span class="fx__n">05</span><span class="fx__name">Üç Renkli</span><span class="fx__c">2 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#glutensiz" data-fx="5"><span class="fx__n">06</span><span class="fx__name">Glutensiz</span><span class="fx__c">3 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#cips" data-fx="6"><span class="fx__n">07</span><span class="fx__name">Makarna Cipsi</span><span class="fx__c">3 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#irmik" data-fx="7"><span class="fx__n">08</span><span class="fx__name">İrmik</span><span class="fx__c">2 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li><li><a class="fx" href="./urunlerimiz.html#un" data-fx="8"><span class="fx__n">09</span><span class="fx__name">Un</span><span class="fx__c">1 ürün</span><span class="fx__go"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></li></ul>
+      <div class="fxs__stage"><div class="fxs__pics" aria-hidden="true"><img src="./img/urun/makarna-penne-rigate-kutu.webp" alt="" data-fx-pic="0" class="is-on" loading="lazy" decoding="async"><img src="./img/urun/lazanya-santa-sophia-lazanya.webp" alt="" data-fx-pic="1" class="is-wide" loading="lazy" decoding="async"><img src="./img/urun/mac-cheese-mac-cheese-1.webp" alt="" data-fx-pic="2" loading="lazy" decoding="async"><img src="./img/urun/tam-bugday-penne-rigate.webp" alt="" data-fx-pic="3" loading="lazy" decoding="async"><img src="./img/urun/uc-renkli-fusilli-1.webp" alt="" data-fx-pic="4" loading="lazy" decoding="async"><img src="./img/urun/glutensiz-fusilli.webp" alt="" data-fx-pic="5" loading="lazy" decoding="async"><img src="./img/urun/makarna-cipsi-peynir.webp" alt="" data-fx-pic="6" loading="lazy" decoding="async"><img src="./img/urun/irmik-irmik-2.webp" alt="" data-fx-pic="7" loading="lazy" decoding="async"><img src="./img/urun/un-un.webp" alt="" data-fx-pic="8" loading="lazy" decoding="async"></div><p class="fxs__cap" data-fx-cap="0">Kısa ve uzun kesim makarnalar; kutu, poşet ve toptan ambalaj.</p><p class="fxs__cap" data-fx-cap="1" hidden>Fırın için lazanya yaprakları; kutu ve toptan ambalaj.</p><p class="fxs__cap" data-fx-cap="2" hidden>Peynir soslu, hazırlaması kolay makarna.</p><p class="fxs__cap" data-fx-cap="3" hidden>Tam buğday irmiğinden makarnalar.</p><p class="fxs__cap" data-fx-cap="4" hidden>Üç renkli burgu; kutu, poşet ve toptan ambalaj.</p><p class="fxs__cap" data-fx-cap="5" hidden>Glutensiz beslenenler için burgu, sedani rigati ve arpa şehriye.</p><p class="fxs__cap" data-fx-cap="6" hidden>Kıtlax: makarnadan çıtır cips, üç aroma.</p><p class="fxs__cap" data-fx-cap="7" hidden>Kendi değirmenlerimizden durum buğdayı irmiği.</p><p class="fxs__cap" data-fx-cap="8" hidden>Çok amaçlı buğday unu.</p></div>
+    </div>
+      <a class="btn btn--red fxs__all" href="./urunlerimiz.html">Tüm ürünlerimiz <svg class="arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
   </section>
 
   <!-- ===== The brands ========================================================== -->
@@ -219,16 +212,15 @@
       <p class="sec-lead">Kendi markalarımızın yanında ithalatçılarımız için özel etiketle de üretiyoruz.</p>
     </header>
     <ul class="brands">
-      <li class="brand" data-peek="./img/urun/makarna-penne-rigate-kutu.webp"><span class="brand__n">01</span><div><h3 class="brand__name"><em>Santa</em> Sophia</h3><span class="brand__tag">Ana ihracat markası</span></div><p class="brand__note">Makarna, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, un.</p></li>
-      <li class="brand" data-peek="./img/urun/lazanya-besler-lazanya.webp"><span class="brand__n">02</span><div><h3 class="brand__name">Beşler</h3><span class="brand__tag">Grubun markası</span></div><p class="brand__note">Makarna, lazanya, makarna peyniri, irmik, un.</p></li>
-      <li class="brand" data-peek="./img/urun/makarna-cipsi-peynir.webp"><span class="brand__n">03</span><div><h3 class="brand__name">Kıtlax</h3></div><p class="brand__note">Makarna cipsi: dört şekil, dört aroma.</p></li>
+      <li class="brand"><span class="brand__n">01</span><div><h3 class="brand__name"><em>Santa</em> Sophia</h3><span class="brand__tag">Ana ihracat markası</span></div><p class="brand__note">Makarna, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, un.</p></li>
+      <li class="brand"><span class="brand__n">02</span><div><h3 class="brand__name">Beşler</h3><span class="brand__tag">Grubun markası</span></div><p class="brand__note">Makarna, lazanya, makarna peyniri, irmik, un.</p></li>
+      <li class="brand"><span class="brand__n">03</span><div><h3 class="brand__name">Kıtlax</h3></div><p class="brand__note">Makarna cipsi: dört şekil, dört aroma.</p></li>
       <li class="brand"><span class="brand__n">04</span><div><h3 class="brand__name">Pastacity</h3></div><p class="brand__note">Makarna.</p></li>
       <li class="brand"><span class="brand__n">05</span><div><h3 class="brand__name">Gonca</h3></div><p class="brand__note">Makarna.</p></li>
       <li class="brand"><span class="brand__n">06</span><div><h3 class="brand__name">Donatella</h3></div><p class="brand__note">Makarna.</p></li>
       <li class="brand"><span class="brand__n">07</span><div><h3 class="brand__name">Cinque <em>Stelle</em></h3></div><p class="brand__note">Makarna.</p></li>
       <li class="brand"><span class="brand__n">08</span><div><h3 class="brand__name">Ülfet</h3></div><p class="brand__note">Makarna.</p></li>
     </ul>
-    <div class="peek" aria-hidden="true"><img alt=""></div>
   </section>
 
   <!-- ===== Production: wheat to carton under one roof ============================ -->
@@ -332,11 +324,11 @@
   <p class="foot__base"><span class="foot__rights"><span>© 2026 Beşsan Makarna</span><span>Tüm hakları saklıdır.</span></span><span class="foot__credit"><span>Web Tasarım</span><a href="https://www.dolphinajans.com/" target="_blank" rel="noopener" dir="ltr">Dolphin Ajans®</a></span></p>
 </footer>
 
-<script src="./js/i18n.js?v=6"></script>
-<script src="./js/home.js?v=6" defer></script>
-<script src="./js/scroll.js?v=6" defer></script>
-<script src="./js/site.js?v=6" defer></script>
-<script src="./js/motion.js?v=6" defer></script>
-<script type="module" src="./js/film.js?v=6"></script>
+<script src="./js/i18n.js?v=7"></script>
+<script src="./js/home.js?v=7" defer></script>
+<script src="./js/scroll.js?v=7" defer></script>
+<script src="./js/site.js?v=7" defer></script>
+<script src="./js/motion.js?v=7" defer></script>
+<script type="module" src="./js/film.js?v=7"></script>
 </body>
 </html>
