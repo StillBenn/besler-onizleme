@@ -3,8 +3,8 @@
   "tone": "dark",
   "vignette": 0.22,
   "grain": 0.012,
-  "autoplay": 24,
-  "autoplayMs": 3200,
+  "autoplay": 30,
+  "autoplayMs": 3600,
   "endTone": "dark",
   "chapters": [
     {
@@ -17,7 +17,7 @@
     },
     {
       "dir": "ch3/",
-      "vh": 3.0
+      "vh": 2.8
     },
     {
       "dir": "ch4/",
@@ -25,8 +25,15 @@
     },
     {
       "dir": "ch5/",
-      "vh": 2.6,
-      "crisp": 0.2
+      "vh": 2.8
+    },
+    {
+      "dir": "ch6/",
+      "vh": 2.8
+    },
+    {
+      "dir": "ch7/",
+      "vh": 2.6
     }
   ],
   "handoff": true,

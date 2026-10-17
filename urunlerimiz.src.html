@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="tr" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ürünlerimiz — Beşler Makarna</title>
+<meta name="description" content="Beşler Makarna ürünleri: makarna, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, makarna cipsi, irmik ve un. Ürünleri seçin, teklif isteyin.">
+<meta name="theme-color" content="#f6f0e6">
+<link rel="icon" href="./img/favicon.png" type="image/png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ürünlerimiz — Beşler Makarna">
+<meta property="og:description" content="Dokuz ürün ailesi, tek kalite.">
+<meta property="og:image" content="./img/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="./css/site.css?v=@V">
+</head>
+<body class="is-paper">
+<a class="skip" href="#katalog">İçeriğe geç</a>
+
+<!--@HEADER-->
+
+<main id="top">
+  <section class="phead" aria-labelledby="urunler-title">
+    <p class="label">Ürünlerimiz</p>
+    <h1 class="phead__title" id="urunler-title">Dokuz aile, <em>tek kalite.</em></h1>
+    <p class="sec-lead">Durum buğdayı irmiğinden makarnalar, lazanya, makarna peyniri, tam buğday, üç renkli, glutensiz, makarna cipsi, irmik ve un. İlgilendiğiniz ürünleri teklif listenize ekleyin; miktarları yazın, teklifimizi gönderelim.</p>
+  </section>
+  <!--@CATBAR-->
+  <div id="katalog">
+  <!--@CATALOG-->
+  </div>
+</main>
+
+<dialog class="pview" data-pview aria-labelledby="pview-title">
+  <button class="pview__close" type="button" data-close aria-label="Kapat">×</button>
+  <div class="pview__in">
+    <div class="pview__img"><img alt="" data-pv-img></div>
+    <div class="pview__t">
+      <p class="label" data-pv-brand></p>
+      <h3 id="pview-title" data-pv-name></h3>
+      <dl>
+        <div><dt>Ürün ailesi</dt><dd data-pv-fam></dd></div>
+        <div><dt>Ambalaj</dt><dd data-pv-pack></dd></div>
+      </dl>
+      <button class="btn btn--red" type="button" data-pv-add>Teklife ekle</button>
+    </div>
+  </div>
+</dialog>
+
+<button class="qtray" type="button" data-qtray aria-label="Teklif listesi"><span>Teklif listesi</span><b data-qcount>0</b></button>
+
+<dialog class="qdrawer" id="teklif" data-qdrawer aria-labelledby="teklif-title">
+  <div class="qdrawer__in">
+    <div class="qdrawer__top"><h2 id="teklif-title">Teklif listeniz</h2><button class="viewer__close" type="button" data-close aria-label="Kapat">×</button></div>
+    <p class="quote__empty" data-empty>Henüz ürün eklemediniz. Bir ürüne “Teklife ekle” deyin.</p>
+    <ul class="quote__list" data-list></ul>
+    <form class="form" data-quote novalidate>
+      <div class="form__row">
+        <div class="field"><label for="q-name">Ad soyad *</label><input id="q-name" name="name" autocomplete="name" required></div>
+        <div class="field"><label for="q-company">Firma</label><input id="q-company" name="company" autocomplete="organization"></div>
+      </div>
+      <div class="form__row">
+        <div class="field"><label for="q-country">Ülke *</label><input id="q-country" name="country" autocomplete="country-name" required></div>
+        <div class="field"><label for="q-email">E-posta *</label><input id="q-email" name="email" type="email" autocomplete="email" required></div>
+      </div>
+      <div class="field"><label for="q-msg">Mesajınız</label><textarea id="q-msg" name="message" placeholder="Ambalaj, etiket, teslim limanı…"></textarea></div>
+      <div class="form__send">
+        <button class="btn btn--red" type="submit">Teklif isteyin</button>
+        <p class="form__hint" aria-live="polite" data-hint></p>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<!--@FOOTER-->
+
+<script src="./js/i18n.js?v=@V"></script>
+<script src="./js/scroll.js?v=@V" defer></script>
+<script src="./js/site.js?v=@V" defer></script>
+<script src="./js/motion.js?v=@V" defer></script>
+</body>
+</html>
