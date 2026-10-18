@@ -730,6 +730,7 @@ export async function mountFilm(root, primary = true) {
   };
 
   let bootInfo = null;
+  let netOpen = false;                 /* the opening is over: six downloads at once (one while the film is off screen) */
   /* The first atlas comes first: once it is on the GPU the opening chapter can
      be scrubbed, before a single full frame has arrived. */
   try {
@@ -774,7 +775,7 @@ export async function mountFilm(root, primary = true) {
         tick();
       });
     }
-    store.limit = 6;
+    store.limit = 6; netOpen = true;   /* (the observer below sets one when the film is off screen; `visible` is not declared yet here) */
     store.t0 = performance.now();      /* the link is judged on all six at work (netT below) */
     intro.done();
   } catch (e) { still(); return; }
@@ -869,9 +870,13 @@ export async function mountFilm(root, primary = true) {
     store.bitmaps.clear(); store.pending.clear();
     renderer.shrinkFrames();
   };
+  /* Off screen the film keeps fetching ahead, one pack at a time: with six it took the link from the page
+     below it, and a product picture waited behind the packs (the reader saw an empty frame where a pack
+     should stand). Back on screen, six again; the link is judged afresh from then (netT below). */
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
     clearTimeout(releaseT);
+    if (netOpen) { store.limit = visible ? 6 : 1; if (visible) { store.t0 = performance.now(); store.rx = []; } }
     if (visible) kick(); else { setMode(""); releaseT = setTimeout(release, 2500); }
   }).observe(root);
 
@@ -958,6 +963,7 @@ export async function mountFilm(root, primary = true) {
   };
   const netT = setInterval(() => {
     if (tier !== "hd" || forced || store.loaded >= n || !store.t0) { if (tier !== "hd" || forced || store.loaded >= n) clearInterval(netT); return; }
+    if (!visible) return;                                        /* one download at a time off screen is not the link's speed */
     const since = performance.now() - store.t0;
     /* judged once six packs have landed (bytes count on arrival: earlier, the
        packs still in flight read as a dead link), or at 8 s whatever came */

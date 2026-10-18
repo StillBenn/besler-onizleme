@@ -92,7 +92,15 @@
       clearTimeout(back);
       if (i === shown) return;
       shown = i;
-      pics.forEach(function (p) { p.classList.toggle("is-on", p.getAttribute("data-fx-pic") === i); });
+      /* the pack still on its way: the one on the stage stays until it has come (4 s at most; site.js keeps
+         a picture that has not arrived invisible, so the stage is never an empty, broken frame) */
+      var pic = pics.filter(function (p) { return p.getAttribute("data-fx-pic") === i; })[0];
+      var swap = function () {
+        if (shown !== i) return;
+        pics.forEach(function (p) { p.classList.toggle("is-on", p === pic); });
+      };
+      if (!pic || pic.classList.contains("is-ready") || !html.classList.contains("pics")) swap();
+      else { pic.loading = "eager"; pic.addEventListener("load", swap, { once: true }); back = setTimeout(swap, 4000); }
       caps.forEach(function (c) { c.hidden = c.getAttribute("data-fx-cap") !== i; });
       fxs.forEach(function (f) { if (f.getAttribute("data-fx") === i) f.setAttribute("aria-current", "true"); else f.removeAttribute("aria-current"); });
     };

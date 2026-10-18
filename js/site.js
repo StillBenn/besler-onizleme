@@ -207,6 +207,22 @@
     dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
   }
 
+  /* ---- pictures that take turns in one frame (a family's pack on the home stage, a card's packs) are shown
+     only once they have arrived: on a slow link one still on its way drew as an empty, broken frame (the reader
+     saw it, the film's packs downloading beside it); one that fails is asked for again, once ---- */
+  html.classList.add("pics");
+  [].slice.call(document.querySelectorAll("[data-fx-pic], .prod__stage img")).forEach(function (im) {
+    var ok = function () { im.classList.add("is-ready"); };
+    var again = function () {
+      if (im.getAttribute("data-again")) return;
+      im.setAttribute("data-again", "1");
+      setTimeout(function () { im.src = im.getAttribute("src").split("?")[0] + "?again=1"; }, 700);
+    };
+    im.addEventListener("load", ok);
+    im.addEventListener("error", again);
+    if (im.complete) { if (im.naturalWidth) ok(); else if (im.getAttribute("src")) again(); }
+  });
+
   /* ---- pictures are opened before they arrive: a big one decoded at the moment it scrolled in cost a dropped frame ---- */
   if ("IntersectionObserver" in window) {
     var early = new IntersectionObserver(function (es) {
